@@ -28,7 +28,7 @@ public class Robot extends IterativeRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   DoubleSolenoid solenoidTest;
   Compressor compressor;
-  Timer timer;
+  javax.swing.Timer timer;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -100,8 +100,9 @@ public class Robot extends IterativeRobot {
     compressor.setClosedLoopControl(true);
     SmartDashboard.putBoolean("on?", compressor.enabled());
     // Soltest.set(DoubleDolenoid.Value.kReverse);
-    if(timer.get() == 5.0){
+    if(timer.isRunning() && timer.get() == 5.0){
       comperessor.setClosedLoopControl(false);
+      timer.stop();
     }
 
 
