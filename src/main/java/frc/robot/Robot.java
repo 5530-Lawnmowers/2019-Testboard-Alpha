@@ -28,7 +28,9 @@ public class Robot extends IterativeRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   DoubleSolenoid solenoidTest;
   Compressor compressor;
-  javax.swing.Timer timer;
+  Timer compressingTimer;
+  Timer actuatorTimer;
+  Boolean isDoneCompressing;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -39,9 +41,7 @@ public class Robot extends IterativeRobot {
     m_chooser.addDefault("Default Auto", kDefaultAuto);
     m_chooser.addObject("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    solenoidTest = new DoubleSolenoid(4,5);
-    compressor = new Compressor(0);
-    timer = new Timer();
+
   }
 
   /**
@@ -91,19 +91,42 @@ public class Robot extends IterativeRobot {
     }
   }
 
+  @Override
+  public void teleopInit() {
+    solenoidTest = new DoubleSolenoid(4,5);
+    compressor = new Compressor(0);
+    compressingTimer = new Timer();
+    actuatorTimer = new Timer();
+    compressor.start();
+    compressingTimer.reset();
+    compressingTimer.start();
+    isDoneCompressing = false;
+  }
+
   /**
    * This function is called periodically during operator control.
    */
   @Override
   public void teleopPeriodic() {
-    
-    compressor.setClosedLoopControl(true);
-    SmartDashboard.putBoolean("on?", compressor.enabled());
-    // Soltest.set(DoubleDolenoid.Value.kReverse);
-    if(timer.isRunning() && timer.get() == 5.0){
-      comperessor.setClosedLoopControl(false);
-      timer.stop();
+    SmartDashboard.putNumber("Timer", actuatorTimer.get());
+    if(compressingTimer.get() >= 5.0){
+      compressor.stop();
+      compressingTimer.reset();
+      compressingTimer.stop();
+      actuatorTimer.start();
+      solenoidTest.set(DoubleSolenoid.Value.kReverse);
     }
+    if(actuatorTimer.get() >= 1.0){
+      if(solenoidTest.get() == DoubleSolenoid.Value.kReverse){
+        solenoidTest.set(DoubleSolenoid.Value.kForward);
+      } else {
+        solenoidTest.set(DoubleSolenoid.Value.kReverse);
+      }
+      actuatorTimer.reset();
+      actuatorTimer.start();
+    }
+
+
 
 
   }
