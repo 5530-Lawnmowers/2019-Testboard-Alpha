@@ -13,6 +13,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.CameraServer;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -41,6 +45,9 @@ public class Robot extends IterativeRobot {
     m_chooser.addDefault("Default Auto", kDefaultAuto);
     m_chooser.addObject("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    //Camera Feed Stuff
+    CameraServer.getInstance().startAutomaticCapture();
 
   }
 
@@ -108,6 +115,8 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void teleopPeriodic() {
+    //Pneumatics Testing Stuff
+    /*
     SmartDashboard.putNumber("Timer", actuatorTimer.get());
     if(compressingTimer.get() >= 5.0){
       compressor.stop();
@@ -125,9 +134,24 @@ public class Robot extends IterativeRobot {
       actuatorTimer.reset();
       actuatorTimer.start();
     }
+    */
 
 
+    //Limelight Testing Stuff
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry tx = table.getEntry("tx");
+    NetworkTableEntry ty = table.getEntry("ty");
+    NetworkTableEntry ta = table.getEntry("ta");
 
+    //read values periodically
+    double x = tx.getDouble(0.0);
+    double y = ty.getDouble(0.0);
+    double area = ta.getDouble(0.0);
+
+    //post to smart dashboard periodically
+    SmartDashboard.putNumber("LimelightX", x);
+    SmartDashboard.putNumber("LimelightY", y);
+    SmartDashboard.putNumber("LimelightArea", area);
 
   }
 
